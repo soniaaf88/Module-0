@@ -93,11 +93,12 @@ def sigmoid(x: float) -> float:
         z = math.exp(x)
         return z / (1 + z)
 
-
+#
     raise NotImplementedError("Need to implement for Task 0.1")
 
 
 def relu(x: float) -> float:
+    
     """
     $f(x) =$ x if x is greater than 0, else 0
 
