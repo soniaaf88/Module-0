@@ -23,6 +23,7 @@ from minitorch.operators import (
     relu_back,
     sigmoid,
     sum,
+    zipWith,
 )
 
 from .strategies import assert_close, small_floats
@@ -98,54 +99,89 @@ def test_eq(a: float) -> None:
 # mathematical rules.
 
 
+
 @pytest.mark.task0_2
 @given(small_floats)
-def test_sigmoid(a: float) -> None:
-    """Check properties of the sigmoid function, specifically
+def test_sigmoid_properties(a: float):
+    """
+    Check properties of the sigmoid function, specifically
     * It is always between 0.0 and 1.0.
     * one minus sigmoid is the same as sigmoid of the negative
     * It crosses 0 at 0.5
-    * It is  strictly increasing.
+    * It is strictly increasing.
     """
-    # TODO: Implement for Task 0.2.
-    raise NotImplementedError("Need to implement for Task 0.2")
+    # It is always between 0.0 and 1.0.
+    assert 0 <= sigmoid(a) <= 1
+
+    # one minus sigmoid is the same as sigmoid of the negative
+    assert sigmoid(-a) == pytest.approx(1 - sigmoid(a))
+
+    # It crosses 0 at 0.5
+    if a == 0:
+        assert sigmoid(a) == pytest.approx(0.5)
+
+   
+    next_value = a + (1e-6 if a < 100 else -1e-6)
+    assert sigmoid(a) <= sigmoid(next_value)
+
+   #raise NotImplementedError("test_distribute is not yet implemented")
 
 
 @pytest.mark.task0_2
 @given(small_floats, small_floats, small_floats)
 def test_transitive(a: float, b: float, c: float) -> None:
     "Test the transitive property of less-than (a < b and b < c implies a < c)"
-    # TODO: Implement for Task 0.2.
-    raise NotImplementedError("Need to implement for Task 0.2")
+    if lt(a, b) and lt(b, c):
+        assert lt(a, c)
+    else:
+        # You may choose to pass this else block if you only want to test the positive case of transitivity
+        pass
+
+
+
+    #raise NotImplementedError("test_distribute is not yet implemented")
+
 
 
 @pytest.mark.task0_2
-def test_symmetric() -> None:
+@given(small_floats, small_floats)
+def test_symmetric(a: float, b: float) -> None:
     """
     Write a test that ensures that :func:`minitorch.operators.mul` is symmetric, i.e.
     gives the same value regardless of the order of its input.
     """
     # TODO: Implement for Task 0.2.
-    raise NotImplementedError("Need to implement for Task 0.2")
+  
+    assert_close(mul(a, b), mul(b, a))
+    #raise NotImplementedError("test_distribute is not yet implemented")
+    
+    
 
 
 @pytest.mark.task0_2
-def test_distribute() -> None:
+@given(small_floats, small_floats, small_floats)
+def test_distribute(z: float, x: float, y: float) -> None:
     r"""
     Write a test that ensures that your operators distribute, i.e.
     :math:`z \times (x + y) = z \times x + z \times y`
     """
     # TODO: Implement for Task 0.2.
-    raise NotImplementedError("Need to implement for Task 0.2")
+    
+    assert_close(mul(z, add(x, y)), add(mul(z, x), mul(z, y)))   
+    #raise NotImplementedError("test_distribute is not yet implemented")
+
 
 
 @pytest.mark.task0_2
-def test_other() -> None:
+@given(small_floats)
+def test_other(x: float) -> None:
     """
     Write a test that ensures some other property holds for your functions.
     """
     # TODO: Implement for Task 0.2.
-    raise NotImplementedError("Need to implement for Task 0.2")
+    assert mul(x, 1) == x
+
+    #raise NotImplementedError("Need to implement for Task 0.2")
 
 
 # ## Task 0.3  - Higher-order functions
@@ -174,7 +210,16 @@ def test_sum_distribute(ls1: List[float], ls2: List[float]) -> None:
     is the same as the sum of each element of `ls1` plus each element of `ls2`.
     """
     # TODO: Implement for Task 0.3.
-    raise NotImplementedError("Need to implement for Task 0.3")
+    sum_ls1 = sum(ls1)
+    sum_ls2 = sum(ls2)
+    combined_sum = sum_ls1 + sum_ls2
+    # Use zipWith and add 
+    sum_of_elements = sum(zipWith(add)(ls1, ls2))
+    # Use assert_close to check if the two sums are approximately equal.
+    assert_close(combined_sum, sum_of_elements)
+    
+
+    #raise NotImplementedError("Need to implement for Task 0.3")
 
 
 @pytest.mark.task0_3
